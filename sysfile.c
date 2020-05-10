@@ -442,3 +442,31 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+int
+sys_lseek(void)
+{
+  int fd;
+  int offset;
+  int type;
+  // int i;
+  struct file *file;
+  argfd(0, &fd, &file);
+  argint(1, &offset);
+  argint(2, &type);
+
+  if (type == SEEK_CUR) {
+
+    offset = file->off + offset;
+
+  }
+
+  else if (type == SEEK_END) {
+
+    offset = file->ip->size + offset;
+
+  }
+
+  return offset;
+
+}
