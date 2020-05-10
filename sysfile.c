@@ -449,24 +449,51 @@ sys_lseek(void)
   int fd;
   int offset;
   int type;
-  // int i;
+  //int i;
   struct file *file;
+  int new_offset;
   argfd(0, &fd, &file);
   argint(1, &offset);
   argint(2, &type);
 
   if (type == SEEK_CUR) {
 
-    offset = file->off + offset;
+    new_offset = file->off + offset;
 
   }
 
   else if (type == SEEK_END) {
 
-    offset = file->ip->size + offset;
+    new_offset = file->ip->size + offset;
 
   }
 
-  return offset;
+  else {
+
+    new_offset = offset;
+
+  }
+
+  /*if (offset > file->ip->size) {
+
+    int zerosize = offset - file->ip->size;
+    char *zeroed = kalloc();
+    char *z = zeroed;
+    for (i = 0; i < 4096; i++)
+      *z = 0;
+    while(zerosize > 0) {
+
+      filewrite(file, zeroed, zerosize);
+      zerosize -= 4096;
+
+    }
+
+    kfree(zeroed);
+
+  }
+
+  file->off = offset;*/
+
+  return new_offset;
 
 }
