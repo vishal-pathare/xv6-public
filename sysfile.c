@@ -449,8 +449,7 @@ sys_lseek(void)
   int fd;
   int offset;
   int type;
-  //int i;
-  struct file *file;
+  struct file *file = 0;
   int new_offset;
   argfd(0, &fd, &file);
   argint(1, &offset);
@@ -464,7 +463,18 @@ sys_lseek(void)
 
   else if (type == SEEK_END) {
 
-    new_offset = file->ip->size + offset;
+    ilock(file->ip);
+
+		if(file->ip->size + offset < 0) {
+
+			iunlock(file->ip);
+			return -1;
+
+		}
+
+		new_offset = file->ip->size + offset;
+
+		iunlock(file->ip);    
 
   }
 
@@ -474,25 +484,7 @@ sys_lseek(void)
 
   }
 
-  /*if (offset > file->ip->size) {
-
-    int zerosize = offset - file->ip->size;
-    char *zeroed = kalloc();
-    char *z = zeroed;
-    for (i = 0; i < 4096; i++)
-      *z = 0;
-    while(zerosize > 0) {
-
-      filewrite(file, zeroed, zerosize);
-      zerosize -= 4096;
-
-    }
-
-    kfree(zeroed);
-
-  }
-
-  file->off = offset;*/
+  file->off = offset;
 
   return new_offset;
 
